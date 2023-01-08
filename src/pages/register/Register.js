@@ -1,14 +1,35 @@
+import React, { lazy, Suspense } from "react";
+// import { wait } from "../../Routes";
+
+const AdminData = lazy(() =>
+  // wait(3000).then(() =>
+  import("./AdminData").then((module) => {
+    return { default: module.AdminData };
+  })
+);
+// );
+
 export const Register = () => {
+  const [isAdmin, setIsAdmin] = React.useState(true);
+
   return (
     <div className="row">
       <div className="col-12 col-md-6 mt-5">
         <h1 className="">Job application form</h1>
         <h2>Section 1</h2>
-        <span title="close">X</span>
+        <div title="close">X</div>
         <img
           src="https://via.placeholder.com/150"
           alt="a person with a laptop"
         />
+        <div>
+          <Suspense fallback={<h5>Loading...</h5>}>
+            {isAdmin ? <AdminData /> : <h4>No Admin Found!</h4>}
+          </Suspense>
+          <p>
+            <button onClick={() => setIsAdmin(!isAdmin)}>Toggle Admin</button>
+          </p>
+        </div>
       </div>
 
       <div className="col-12 col-md-6 mt-5">
