@@ -2,27 +2,32 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Login = () => {
-  const [user, setUser] = useState({ email: "", password: "" });
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState({});
 
-  const handleSubmit = async () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("https://jsonplaceholder.typicode.com/users");
+      const res = await fetch("https://jsonplaceholder.typicode.com/users/1");
       const data = await res.json();
-      console.log("data =>", data);
+      setUser(data);
       setLoading(false);
     } catch (err) {
       setError(err);
       setLoading(false);
     }
-    console.log(user);
   };
+
   return (
     <div className="row">
+      <h4 className="mb-3 mt-3 text-green-800" data-testid="displayName">
+        {user?.name ? user?.name : ""}
+      </h4>
       <form action="/action_page.php">
         <div className="mb-3 mt-3 text-danger" data-testid="error">
           {error ? error : ""}
@@ -35,8 +40,8 @@ const Login = () => {
             type="email"
             className="form-control"
             placeholder="Enter email"
-            value={user.email}
-            onChange={({ target }) => setUser({ ...user, email: target.value })}
+            value={email}
+            onChange={({ target }) => setEmail(target.value)}
           />
         </div>
         <div className="mb-3">
@@ -47,10 +52,8 @@ const Login = () => {
             type="password"
             className="form-control"
             placeholder="Enter password"
-            value={user.password}
-            onChange={({ target }) =>
-              setUser({ ...user, password: target.value })
-            }
+            value={password}
+            onChange={({ target }) => setPassword(target.value)}
           />
         </div>
         <div className="form-check mb-3">
@@ -65,7 +68,7 @@ const Login = () => {
         </div>
         <button
           onClick={handleSubmit}
-          disabled={!user.email && !user.password}
+          disabled={!email && !password}
           type="button"
           className="btn btn-primary"
         >

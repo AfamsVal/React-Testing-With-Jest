@@ -1,5 +1,14 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Login from "./Login";
+
+jest.mock("axios", () => ({
+  __esModule: true,
+  default: {
+    get: () => ({
+      data: { id: 1, name: "John" },
+    }),
+  },
+}));
 
 describe("collective login test", () => {
   test("if it is username", () => {
@@ -72,7 +81,7 @@ describe("collective login test", () => {
     expect(btn).not.toBeDisabled();
   });
 
-  test("button to have loading html", () => {
+  test("login button to have spinner loading html", () => {
     render(<Login />);
     const emailInput = screen.getByPlaceholderText(/Enter email/i);
     const pwdInput = screen.getByPlaceholderText(/Enter password/i);
@@ -82,6 +91,36 @@ describe("collective login test", () => {
     fireEvent.change(emailInput, { target: { value: email } });
     fireEvent.change(pwdInput, { target: { value: pwd } });
     fireEvent.click(btn);
+    // expect(btn.innerHTML).toMatch(/spinner-border/i);
     expect(btn.innerHTML).toContain("spinner-border");
+  });
+
+  test("login button not to have spinner loading after fetching", async () => {
+    render(<Login />);
+    const emailInput = screen.getByPlaceholderText(/Enter Email/i);
+    const pwdInput = screen.getByPlaceholderText(/Enter Password/i);
+    const btnElement = screen.getByRole("button");
+    const testValue = "test";
+
+    fireEvent.change(emailInput, { target: { value: testValue } });
+    fireEvent.change(pwdInput, { target: { value: testValue } });
+    fireEvent.click(btnElement);
+    await waitFor(() =>
+      expect(btnElement.innerHTML).not.toContain("spinner-border")
+    );
+  });
+
+  test("User should be rendered on the DOM after fetching", async () => {
+    render(<Login />);
+    const emailInput = screen.getByPlaceholderText(/Enter Email/i);
+    const pwdInput = screen.getByPlaceholderText(/Enter Password/i);
+    const btnElement = screen.getByRole("button");
+    const testValue = "test";
+
+    fireEvent.change(emailInput, { target: { value: testValue } });
+    fireEvent.change(pwdInput, { target: { value: testValue } });
+    fireEvent.click(btnElement);
+    const userItem = await screen.findByTestId("displayName");
+    await waitFor(() => expect(userItem.textContent.length).toBeGreaterThan(1));
   });
 });
