@@ -1,0 +1,9 @@
+.img-height {
+  height: 150px;
+  position: relative;
+}
+.favorite-icon {
+  top: 10px;
+  right: 10px;
+  position: absolute;
+}
